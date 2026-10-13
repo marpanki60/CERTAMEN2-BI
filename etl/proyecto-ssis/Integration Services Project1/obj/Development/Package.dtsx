@@ -11,8 +11,8 @@
   DTS:LocaleID="13322"
   DTS:ObjectName="Package"
   DTS:PackageType="5"
-  DTS:VersionBuild="33"
-  DTS:VersionGUID="{0650B5B6-60A6-4048-A7F8-02A1D6605868}">
+  DTS:VersionBuild="36"
+  DTS:VersionGUID="{5BC28B00-304A-4684-9170-24ED127BC778}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -1344,9 +1344,9 @@
     dp.SK_Producto,
     dc.SK_Cliente,
     de.SK_Empleado,
-    dt.SK_Transportista,
+    ISNULL(dt.SK_Transportista, -1) AS SK_Transportista,
     CONVERT(INT, CONVERT(VARCHAR(8), o.FechaOrden, 112)) AS SK_FechaOrden,
-    CONVERT(INT, CONVERT(VARCHAR(8), o.FechaEnvio, 112)) AS SK_FechaEnvio,
+    ISNULL(CONVERT(INT, CONVERT(VARCHAR(8), o.FechaEnvio, 112)), -1) AS SK_FechaEnvio,
     do.Cantidad,
     do.PrecioUnitario,
     do.Descuento,
@@ -1361,7 +1361,7 @@ JOIN KentFoods_DW.dbo.Dim_Cliente dc
     ON o.ClienteID = dc.ClienteID
 JOIN KentFoods_DW.dbo.Dim_Empleado de 
     ON o.EmpleadoID = de.EmpleadoID
-JOIN KentFoods_DW.dbo.Dim_Transportista dt 
+LEFT JOIN KentFoods_DW.dbo.Dim_Transportista dt 
     ON o.EnviadoPor = dt.TransportistaID;</property>
                 <property
                   dataType="System.String"
@@ -1883,6 +1883,18 @@ WITH GeneradorFechas AS (
     WHERE Fecha &lt; @FechaFin
 )
 SELECT 
+    -1 AS SK_Fecha,
+    CAST('1900-01-01' AS DATE) AS Fecha,
+    0 AS Anio,
+    0 AS Semestre,
+    0 AS Trimestre,
+    0 AS Mes,
+    CAST('No Aplica' AS NVARCHAR(20)) AS NombreMes,
+    0 AS Dia
+
+UNION ALL
+
+SELECT 
     CAST(CONVERT(VARCHAR(8), Fecha, 112) AS INT) AS SK_Fecha,
     Fecha,
     YEAR(Fecha) AS Anio,
@@ -2127,7 +2139,7 @@ OPTION (MAXRECURSION 0);</property>
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{3EE54F08-DDBC-4C9D-90AC-24AB6F61F6B7}"
-          SQLTask:SqlStatementSource="TRUNCATE TABLE dbo.Fact_Ventas;&#xA;&#xA;DELETE FROM dbo.Dim_Producto;&#xA;DELETE FROM dbo.Dim_Cliente;&#xA;DELETE FROM dbo.Dim_Empleado;&#xA;DELETE FROM dbo.Dim_Transportista;&#xA;DELETE FROM dbo.Dim_Fecha;&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Producto') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Producto', RESEED, 0);&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Cliente') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Cliente', RESEED, 0);&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Empleado') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Empleado', RESEED, 0);&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Transportista') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Transportista', RESEED, 0);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:SqlStatementSource="TRUNCATE TABLE dbo.Fact_Ventas;&#xA;&#xA;DELETE FROM dbo.Dim_Producto;&#xA;DELETE FROM dbo.Dim_Cliente;&#xA;DELETE FROM dbo.Dim_Empleado;&#xA;DELETE FROM dbo.Dim_Transportista;&#xA;DELETE FROM dbo.Dim_Fecha;&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Producto') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Producto', RESEED, 0);&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Cliente') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Cliente', RESEED, 0);&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Empleado') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Empleado', RESEED, 0);&#xA;&#xA;IF IDENT_CURRENT('dbo.Dim_Transportista') &gt; 1&#xA;    DBCC CHECKIDENT ('dbo.Dim_Transportista', RESEED, 0);&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -3284,7 +3296,7 @@ LEFT JOIN Proveedores pr ON p.ProveedorID = pr.ProveedorID;</property>
     design-time-name="Package\Fact ventas">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="177,42"
           Id="Package\Fact ventas\Fact_Ventas Origen"
@@ -3312,9 +3324,7 @@ LEFT JOIN Proveedores pr ON p.ProveedorID = pr.ProveedorID;</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -3345,7 +3355,7 @@ LEFT JOIN Proveedores pr ON p.ProveedorID = pr.ProveedorID;</property>
     design-time-name="Package\Fecha">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="150,42"
           Id="Package\Fecha\Fecha Destino"
@@ -3373,9 +3383,7 @@ LEFT JOIN Proveedores pr ON p.ProveedorID = pr.ProveedorID;</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
