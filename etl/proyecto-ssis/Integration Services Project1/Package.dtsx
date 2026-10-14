@@ -11,8 +11,8 @@
   DTS:LocaleID="13322"
   DTS:ObjectName="Package"
   DTS:PackageType="5"
-  DTS:VersionBuild="36"
-  DTS:VersionGUID="{5BC28B00-304A-4684-9170-24ED127BC778}">
+  DTS:VersionBuild="37"
+  DTS:VersionGUID="{62C7F3E9-B868-4F2C-B0C6-EF532BC43E0F}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -25,7 +25,7 @@
         <DTS:ConnectionManager
           DTS:ConnectRetryCount="1"
           DTS:ConnectRetryInterval="5"
-          DTS:ConnectionString="Data Source=localhost;Initial Catalog=KentFoods;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+          DTS:ConnectionString="Data Source=.\MSSQLSERVER01;Initial Catalog=KentFoods;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
     <DTS:ConnectionManager
@@ -37,7 +37,7 @@
         <DTS:ConnectionManager
           DTS:ConnectRetryCount="1"
           DTS:ConnectRetryInterval="5"
-          DTS:ConnectionString="Data Source=localhost;Initial Catalog=KentFoods_DW;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+          DTS:ConnectionString="Data Source=.\MSSQLSERVER01;Initial Catalog=KentFoods_DW;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
@@ -1358,7 +1358,7 @@ JOIN Ordenes o
 JOIN KentFoods_DW.dbo.Dim_Producto dp 
     ON do.ProductoID = dp.ProductoID
 JOIN KentFoods_DW.dbo.Dim_Cliente dc 
-    ON o.ClienteID = dc.ClienteID
+    ON o.ClienteID COLLATE DATABASE_DEFAULT = dc.ClienteID COLLATE DATABASE_DEFAULT
 JOIN KentFoods_DW.dbo.Dim_Empleado de 
     ON o.EmpleadoID = de.EmpleadoID
 LEFT JOIN KentFoods_DW.dbo.Dim_Transportista dt 
@@ -2970,31 +2970,31 @@ LEFT JOIN Proveedores pr ON p.ProveedorID = pr.ProveedorID;</property>
       <GraphLayout
         Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="113,42"
+          Size="112.8,41.6"
           Id="Package\Cliente"
           TopLeft="610,150" />
         <NodeLayout
-          Size="129,42"
+          Size="128.8,41.6"
           Id="Package\Empleado"
           TopLeft="435,149" />
         <NodeLayout
-          Size="136,42"
+          Size="136,41.6"
           Id="Package\Fact ventas"
           TopLeft="773,241" />
         <NodeLayout
-          Size="110,42"
+          Size="110.4,41.6"
           Id="Package\Fecha"
           TopLeft="987,238" />
         <NodeLayout
-          Size="168,42"
+          Size="168,41.6"
           Id="Package\Limpieza de datos"
           TopLeft="230,145" />
         <NodeLayout
-          Size="123,42"
+          Size="123.2,41.6"
           Id="Package\Producto"
           TopLeft="976,147" />
         <NodeLayout
-          Size="143,42"
+          Size="143.2,41.6"
           Id="Package\Transportista"
           TopLeft="774,148" />
         <EdgeLayout
@@ -3298,11 +3298,11 @@ LEFT JOIN Proveedores pr ON p.ProveedorID = pr.ProveedorID;</property>
       <GraphLayout
         Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="177,42"
+          Size="176.8,41.6"
           Id="Package\Fact ventas\Fact_Ventas Origen"
           TopLeft="276,124" />
         <NodeLayout
-          Size="181,42"
+          Size="180.8,41.6"
           Id="Package\Fact ventas\Fact_Ventas Destino"
           TopLeft="637,125" />
         <EdgeLayout
